@@ -79,14 +79,19 @@ class MainActivity : Activity() {
             ): Boolean {
                 fileChooserCallback?.onReceiveValue(null)
                 fileChooserCallback = callback
-                val intent = params.createIntent().apply {
+                // Use Android's Storage Access Framework directly. This avoids
+                // WebView's inferred MIME filters hiding model files in DocumentsUI.
+                val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
                     type = "*/*"
+                    putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("*/*"))
+                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, params.mode == FileChooserParams.MODE_OPEN_MULTIPLE)
                 }
                 return try {
                     startActivityForResult(intent, fileChooserRequest)
                     true
                 } catch (_: Exception) {
+                    fileChooserCallback?.onReceiveValue(null)
                     fileChooserCallback = null
                     false
                 }
@@ -119,7 +124,8 @@ class MainActivity : Activity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == fileChooserRequest) {
             val result = if (resultCode == Activity.RESULT_OK && data != null) {
-                WebChromeClient.FileChooserParams.parseResult(resultCode, data)
+                val parsed = WebChromeClient.FileChooserParams.parseResult(resultCode, data)
+                parsed ?: data.data?.let { arrayOf(it) }
             } else null
             fileChooserCallback?.onReceiveValue(result)
             fileChooserCallback = null
