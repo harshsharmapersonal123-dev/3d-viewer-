@@ -25,7 +25,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.9"
-      - name: Check HTML asset exists
+      - name: Reassemble original HTML file
+        run: cat app/src/main/assets/html_parts/part-*.txt > app/src/main/assets/index.html
+      - name: Verify HTML asset
         run: test -s app/src/main/assets/index.html
       - name: Build installable debug APK
         run: gradle --no-daemon :app:assembleDebug
