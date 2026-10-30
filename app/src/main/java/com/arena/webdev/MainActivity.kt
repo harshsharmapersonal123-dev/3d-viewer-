@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
+import android.view.View
 import android.webkit.*
 import android.widget.Toast
 import java.io.File
@@ -18,6 +20,8 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         webView = WebView(this)
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
+        webView.setBackgroundColor(android.graphics.Color.BLACK)
         setContentView(webView)
 
         webView.settings.apply {
@@ -72,6 +76,17 @@ class MainActivity : Activity() {
             }
         }
         webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(message: ConsoleMessage): Boolean {
+                if (message.messageLevel() == ConsoleMessage.MessageLevel.ERROR) {
+                    val detail = message.message() + " (line " + message.lineNumber() + ")"
+                    Log.e("3DViewer-Web", detail)
+                    runOnUiThread {
+                        Toast.makeText(this@MainActivity, "Viewer error: " + message.message(), Toast.LENGTH_LONG).show()
+                    }
+                }
+                return true
+            }
+
             override fun onShowFileChooser(
                 webView: WebView,
                 callback: ValueCallback<Array<Uri>>,
