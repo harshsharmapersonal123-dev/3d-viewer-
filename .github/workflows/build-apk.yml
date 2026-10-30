@@ -2,6 +2,8 @@ name: Build 3D Viewer APK
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -18,7 +20,9 @@ jobs:
           distribution: temurin
           java-version: "17"
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
       - name: Install Android SDK packages
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Set up Gradle
