@@ -30,6 +30,7 @@ class ModelWidgetProvider : AppWidgetProvider() {
         val open = Intent(context, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             .putExtra("render_widget", true)
+            .putExtra("widget_action", intent.action)
         context.startActivity(open)
     }
 
