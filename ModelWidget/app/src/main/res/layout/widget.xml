@@ -1,0 +1,14 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="6dp" android:background="#171D29">
+    <ImageView android:id="@+id/model_preview" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitCenter"
+        android:contentDescription="3D model preview" android:background="#202A3A" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="42dp"
+        android:gravity="center" android:orientation="horizontal">
+        <Button android:id="@+id/rotate_left" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="◀" android:minWidth="0dp" android:padding="0dp" />
+        <Button android:id="@+id/zoom_out" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="−" android:minWidth="0dp" android:padding="0dp" />
+        <Button android:id="@+id/zoom_in" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="+" android:minWidth="0dp" android:padding="0dp" />
+        <Button android:id="@+id/rotate_right" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:text="▶" android:minWidth="0dp" android:padding="0dp" />
+    </LinearLayout>
+</LinearLayout>
