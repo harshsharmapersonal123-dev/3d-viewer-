@@ -2,7 +2,7 @@ name: Build ModelWidget APK
 
 on:
   push:
-    branches: [ modelwidget-build ]
+    branches: [ main, modelwidget-build ]
     paths:
       - 'ModelWidget/**'
       - '.github/workflows/build-modelwidget-apk.yml'
