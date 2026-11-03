@@ -1,0 +1,48 @@
+name: Build Live2D Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        run: |
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;26.3.11579264" "cmake;3.22.1"
+
+      - name: Reassemble original SDK archive
+        run: |
+          curl -fL "https://raw.githubusercontent.com/harshsharmapersonal123-dev/3d-viewer-/main/Live2D_SDK_part_1.bin" -o part1.bin
+          curl -fL "https://raw.githubusercontent.com/harshsharmapersonal123-dev/3d-viewer-/main/Live2D_SDK_part_2.bin" -o part2.bin
+          cat part1.bin part2.bin > CubismSdkForNative-5-r.5.zip
+          unzip -t CubismSdkForNative-5-r.5.zip
+          unzip -q CubismSdkForNative-5-r.5.zip -d sdk
+
+      - name: Build Android debug APK
+        working-directory: sdk/CubismSdkForNative-5-r.5/Samples/OpenGL/Demo/proj.android.cmake/Full
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Live2D-Demo-debug-APK
+          path: sdk/CubismSdkForNative-5-r.5/Samples/OpenGL/Demo/proj.android.cmake/Full/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
