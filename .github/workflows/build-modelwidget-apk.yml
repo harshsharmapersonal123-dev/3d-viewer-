@@ -72,13 +72,44 @@ jobs:
             controls.update();
             camera.lookAt(center);
           }"""
-          start = html.index("function DA(){")
+          helper = """function ensureModelRenderable(root){
+            if(!root)return;
+            root.visible=true;
+            root.traverse(node=>{
+              node.visible=true;
+              if(!node.isMesh)return;
+              node.frustumCulled=false;
+              node.renderOrder=1;
+              if(!node.material)node.material=new Pe({color:"#d1d5db",roughness:.8,side:2});
+              const materials=Array.isArray(node.material)?node.material:[node.material];
+              materials.forEach(material=>{
+                if(!material)return;
+                material.visible=true;
+                material.side=2;
+                material.depthTest=true;
+                material.depthWrite=true;
+                if(!Number.isFinite(material.opacity)||material.opacity<=0.01){
+                  material.opacity=1;
+                  material.transparent=false;
+                }
+                material.needsUpdate=true;
+              });
+            });
+            root.updateWorldMatrix(true,true);
+          }
+                    start = html.index("function DA(){")
           end = html.index("function XA(", start)
           html = html[:start] + new + html[end:]
+          load_marker = "h.current=tI,Q.current?.add(tI);const eI=bA(tI);"
+          if load_marker not in html:
+              raise SystemExit("Could not find model attachment code; refusing to build an unpatched APK")
+          html = html.replace(load_marker, "h.current=tI,Q.current?.add(tI);ensureModelRenderable(tI);const eI=bA(tI);", 1)
+          html = html.replace('grep-never-match-placeholder', '')
           path.write_text(html)
           PY
           test -s ModelWidget/app/src/main/assets/index.html
           grep -q 'visible geometry bounds' ModelWidget/app/src/main/assets/index.html
+          grep -q 'ensureModelRenderable(tI)' ModelWidget/app/src/main/assets/index.html
       - name: Build debug APK
         working-directory: ModelWidget
         run: gradle --no-daemon :app:assembleDebug
