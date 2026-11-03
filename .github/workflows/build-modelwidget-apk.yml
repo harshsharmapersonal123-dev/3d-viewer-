@@ -101,6 +101,7 @@ jobs:
           start = html.index("function DA(){")
           end = html.index("function XA(", start)
           html = html[:start] + new + html[end:]
+          html = html.replace("function DA(){", helper + "function DA(){", 1)
           load_marker = "h.current=tI,Q.current?.add(tI);const eI=bA(tI);"
           if load_marker not in html:
               raise SystemExit("Could not find model attachment code; refusing to build an unpatched APK")
