@@ -97,14 +97,14 @@ jobs:
             });
             root.updateWorldMatrix(true,true);
           }
-                    start = html.index("function DA(){")
+          """
+          start = html.index("function DA(){")
           end = html.index("function XA(", start)
           html = html[:start] + new + html[end:]
           load_marker = "h.current=tI,Q.current?.add(tI);const eI=bA(tI);"
           if load_marker not in html:
               raise SystemExit("Could not find model attachment code; refusing to build an unpatched APK")
           html = html.replace(load_marker, "h.current=tI,Q.current?.add(tI);ensureModelRenderable(tI);const eI=bA(tI);", 1)
-          html = html.replace('grep-never-match-placeholder', '')
           path.write_text(html)
           PY
           test -s ModelWidget/app/src/main/assets/index.html
