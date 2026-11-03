@@ -103,6 +103,9 @@ jobs:
           html = html[:start] + new + html[end:]
           html = html.replace("function DA(){", helper + "function DA(){", 1)
           load_marker = "h.current=tI,Q.current?.add(tI);const eI=bA(tI);"
+          obj_fix = """if(xA==="obj")tI.traverse(node=>{if(!node.isMesh||!node.geometry)return;const geometry=node.geometry;if(!geometry.getAttribute("normal"))geometry.computeVertexNormals();const sources=Array.isArray(node.material)?node.material:[node.material];node.material=sources.map(material=>new dE({color:material?.color||"#d1d5db",map:material?.map||null,alphaMap:material?.alphaMap||null,vertexColors:material?.vertexColors===true,transparent:material?.transparent===true,opacity:material?.opacity??1,side:2,wireframe:material?.wireframe===true}));});"""
+          html = html.replace(load_marker, obj_fix + load_marker, 1)
+
           if load_marker not in html:
               raise SystemExit("Could not find model attachment code; refusing to build an unpatched APK")
           html = html.replace(load_marker, "h.current=tI,Q.current?.add(tI);ensureModelRenderable(tI);const eI=bA(tI);", 1)
