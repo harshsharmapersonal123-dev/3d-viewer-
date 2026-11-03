@@ -39,7 +39,8 @@ jobs:
           from pathlib import Path
           path = Path("ModelWidget/app/src/main/assets/index.html")
           html = path.read_text()
-          old = "function DA(){if(!h.current||!E.current||!o.current)return;const sA=new WQ().setFromObject(h.current),xA=sA.getCenter(new CA),OA=sA.getSize(new CA),tI=Math.max(OA.x,OA.y,OA.z),eI=Math.max(2,tI*1.6);E.current.position.set(xA.x,xA.y+tI*.2,xA.z+eI),o.current.target.copy(xA),o.current.update()}"
+          import re
+          pattern = r"function DA\\(\\)\\{.*?\\}(?=function XA\\()"
           new = """function DA(){
             if(!h.current||!E.current||!o.current)return;
             h.current.updateWorldMatrix(true,true);
@@ -73,9 +74,11 @@ jobs:
             controls.update();
             camera.lookAt(center);
           }"""
-          if html.count(old) != 1:
-              raise SystemExit(f"Expected one original camera-fit function, found {html.count(old)}")
-          path.write_text(html.replace(old,new))
+          matches = list(re.finditer(pattern, html, re.S))
+          if len(matches) != 1:
+              raise SystemExit(f"Expected one camera-fit function, found {len(matches)}")
+          html = html[:matches[0].start()] + new + html[matches[0].end():]
+          path.write_text(html)
           PY
           test -s ModelWidget/app/src/main/assets/index.html
           grep -q 'visible geometry bounds' ModelWidget/app/src/main/assets/index.html
